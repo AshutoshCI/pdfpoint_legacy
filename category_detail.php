@@ -1,0 +1,757 @@
+<?php
+ob_start();
+include("include/config_pvt.inc.php");
+include("service/category.php");
+$cat = new Category();
+
+$id = $_GET['cat_id'];
+$catId = $id;
+$recId = $id;
+$subjectName = $_GET['subject_name'];
+
+
+$ip = $_SERVER['REMOTE_ADDR'];
+$articleid = $_GET['subject_name'];
+
+/*$purl = htmlspecialchars($_GET['page_url']);*/
+$purl = htmlspecialchars($_SERVER['HTTP_REFERER']);
+if($purl != '')
+{
+	include_once("tracking_url.php");
+}
+$superCategorySql = "select * from pdfpoint_supersubcategory inner join pdfpoint_subcategory on pdfpoint_subcategory.subcategory_id = pdfpoint_supersubcategory.subcategory_id where supercategory_url = '$subjectName'";
+
+//echo $superCategorySql = "select * from pdfpoint_supersubcategory where supercategory_url = '$subjectName'";
+
+
+$sql_description = mysqli_query($conn, $superCategorySql);
+
+$result_description = mysqli_fetch_assoc($sql_description);
+
+include_once("view_article_count.php");
+
+$cat_id = $_GET['cat_id'];
+
+include ("category_description.php");
+?>
+
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<title>PDFpoint.com :: <?=strtr($subjectName,'_',' ')?></title>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta name="Keywords" content="<?=$result_description['subcategory_keywords']?>"/>
+<meta name="Description" content="<?=$result_description['subcategory_short_description']?>"/>
+<script type='text/javascript' src='js/jquery-1.11.2.min.js'></script>
+<script src="<?=SITE_SSL_PATH?>js/owl.carousel.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel = "stylesheet">
+<script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<script type='text/javascript'>
+	var mytheme_urls = {
+		stickynav:'enable'
+ 		,scroll:'enable'
+	};
+ </script>
+ <script>
+(function($) {
+
+    $(function() {
+        $( "#name" ).autocomplete({
+            source: '<?=SITE_SSL_PATH?>ajax_search.php'
+        });
+        
+    });
+    
+})( jQuery );
+</script>
+ 
+ <!--  Added by GoogleAnalytics integration -->
+ <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-75381911-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<!-- /Added by GoogleAnalytics integration -->
+
+<script>
+$('.btnShare').click(function(){
+elem = $(this);
+postToFeed(elem.data('title'), elem.data('desc'), elem.prop('href'), elem.data('image'));
+
+return false;
+});
+</script>
+
+<link rel='stylesheet'  href='<?=SITE_SSL_PATH?>css/shortcodes.css' type='text/css' media='all' />
+<link rel='stylesheet'  href='<?=SITE_SSL_PATH?>css/tooltipster-shadow.css' type='text/css' media='all' />
+<link rel='stylesheet'  href='<?=SITE_SSL_PATH?>css/style.css' type='text/css' media='all' />
+<link rel='stylesheet'  href='<?=SITE_SSL_PATH?>css/main-style.css' type='text/css' media='all' />
+<link rel='stylesheet'  href='<?=SITE_SSL_PATH?>css/font-awesome.min.css' type='text/css' media='all' />
+<link rel='stylesheet'  href='<?=SITE_SSL_PATH?>css/responsive.css' type='text/css' media='all' />
+<link rel='stylesheet'  href='<?=SITE_SSL_PATH?>css/fonts.css' type='text/css' media='all' />
+<link rel='stylesheet'  href='<?=SITE_SSL_PATH?>css/hover-effect.css' type='text/css' media='all' />
+<link rel='stylesheet'  href='<?=SITE_SSL_PATH?>css/left-menu.css' type='text/css' media='all' />
+
+<link href="<?=SITE_SSL_PATH?>css/custom.css" rel="stylesheet">
+<!-- Owl Carousel Assets -->
+<link href="<?=SITE_SSL_PATH?>css/owl.carousel.css" rel="stylesheet">
+<link href="<?=SITE_SSL_PATH?>css/owl.theme.css" rel="stylesheet">
+<script type='text/javascript' src='<?=SITE_SSL_PATH?>js/jquery-1.11.2.min.js'></script>
+<script src="<?=SITE_SSL_PATH?>js/owl.carousel.js"></script>
+<script>
+    $(document).ready(function() {
+
+      //Sort random function
+      function random(owlSelector){
+        owlSelector.children().sort(function(){
+            return Math.round(Math.random()) - 0.5;
+        }).each(function(){
+          $(this).appendTo(owlSelector);
+        });
+      }
+
+      $(".owl-demo").owlCarousel({
+		items : 4,
+        navigation: true,
+        navigationText: [
+        "<i class='fa fa-angle-left'></i>",
+        "<i class='fa fa-angle-right'></i>"
+        ],
+		//Autoplay
+        autoPlay : true,
+        stopOnHover : false,
+		pagination : false,
+		slideSpeed : 200,
+        paginationSpeed : 800,
+        rewindSpeed : 1000,
+        //Call beforeInit callback, elem parameter point to $("#owl-demo")
+        beforeInit : function(elem){
+          random(elem);
+        }
+
+      });
+
+    });
+    </script>
+    <script type="text/javascript">
+
+        function viewCount(articleid) {
+            var currentLocation = window.location;
+            var xhr;
+            if (window.XMLHttpRequest) xhr = new XMLHttpRequest(); // all browsers
+            else xhr = new ActiveXObject("Microsoft.XMLHTTP");     // for IE
+
+            var url = '<?=SITE_SSL_PATH?>article_view_count.php?aid=' + articleid+'&page_url='+currentLocation;
+            xhr.open('GET', url, false);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState===4 && xhr.status===200) {
+                    var div = document.getElementById('viewno');
+                    div.innerHTML = xhr.responseText;
+                    var div = document.getElementById('viewcntno');
+                    div.innerHTML = xhr.responseText;
+                }
+            };
+            xhr.send();
+            // ajax stop
+            return false;
+        }
+    </script>
+<style>
+    .owl-demo .item{
+      display: block;
+      padding:0px;
+      margin: 5px;
+    }
+    .owl-theme .owl-controls .owl-buttons div {
+      padding: 4px 9px;
+    }
+
+    .owl-theme .owl-buttons i{
+      margin-top: 0;
+	  font-size:18px;
+	  font-weight:bold;
+    }
+
+    /*To move navigation buttons outside use these settings:*/
+
+    .owl-theme .owl-controls .owl-buttons div {
+      position: absolute;
+    }
+
+    .owl-theme .owl-controls .owl-buttons .owl-prev{
+      left: -8px;
+      top: 100px; 
+    }
+
+    .owl-theme .owl-controls .owl-buttons .owl-next{
+      right: -8px;
+      top: 100px;
+    }
+    </style>
+
+<style type="text/css">
+nav#main-menu ul li a, .mobile-menu {
+	font-family:Lato, sans-serif;
+}
+body {
+	font-family:Lato, sans-serif;
+	margin:0;
+	padding:0;
+	font-size:14px;
+	background:#eeeeee;
+}
+H1 {
+	font-family:Lato;
+}
+H2 {
+	font-family:Lato;
+}
+/*H3 {
+	font-family:Lato;
+}*/
+H4 {
+	font-family:Lato;
+}
+H5 {
+	font-family:Lato;
+}
+H6 {
+	font-family:Lato;
+}
+.featured-listing .container {
+	width: 100%;
+	overflow: hidden;
+	position: relative;
+	box-sizing: border-box;
+	height:250px;
+}
+.marquee {
+	top: 6em;
+	position: relative;
+	box-sizing: border-box;
+	animation: marquee 15s linear infinite;
+	text-align:left;
+}
+.marquee:hover {
+	animation-play-state: paused;
+}
+.featured-listing .container .marquee ul li {
+	font-size:13px;
+	font-weight:normal;
+	padding-bottom:10px;
+	border-bottom:1px dotted #999;
+	margin-bottom:10px;
+}
+/* Make it move! */
+@keyframes marquee {
+ 0% {
+top:   8em
+}
+ 100% {
+top: -11em
+}
+}
+/* Make it look pretty */
+.microsoft .marquee {
+	margin: 0;
+	padding: 0 1em;
+	line-height: 1.5em;
+}
+ .microsoft:before, .microsoft::before, .microsoft:after, .microsoft::after {
+ left: 0;
+ z-index: 1;
+ content: '';
+ position: absolute;
+ pointer-events: none;
+ width: 100%;
+height: 2em;
+ background-image: linear-gradient(180deg, #FFF, rgba(255, 255, 255, 0));
+}
+ .microsoft:after, .microsoft::after {
+ bottom: 0;
+ transform: rotate(180deg);
+}
+ .microsoft:before, .microsoft::before {
+ top: 0;
+}
+/* Style the links */
+.vanity {
+	color: #333;
+	text-align: center;
+}
+.vanity a, .microsoft a {
+	color: #1570A6;
+ transition: color .5s;
+	text-decoration: none;
+}
+.vanity a:hover, .microsoft a:hover {
+	color: #F65314;
+}
+.dt-sc-social-icons li img:first-child { bottom:0;}
+.dt-sc-social-icons li{ margin:0;}
+#primary{
+	width:100%;
+}
+h3{
+    text-transform:capitalize;
+}
+h2{
+    background-color: #47bfe8;
+    border-radius: 25px;
+    color: green;
+    font-family: arial;
+    font-size: 18px;
+    line-height: 20px;
+    margin: 0;
+    padding: 13px;
+    text-transform: capitalize;
+}
+
+.description{
+    width: 100%;
+    }
+</style>
+
+</head>
+<body class="home page">
+
+<!-- **Wrapper** -->
+<div class="wrapper">
+  <div id="header-wrapper">
+    <header id="header">
+   <?php include("topbar.php");?>
+      
+      <!-- **Header Container** -->
+      <div class="container"> 
+         
+        <!-- **Navigation** -->
+       <?php include("header.php");?>
+    </header>
+  </div>
+  <section class='breadcrumb-section dark-bg'>
+    <div class='breadcrumb-wrapper'>
+        <h1 class='page-title'><marquee width="100%">PDFpoint.com :: <?=strtr($subjectName,'_',' ')?></marquee></h1>
+    </div>
+  </section>
+  <div id="main" style="padding:0;">
+    <div id="main-container" class="container">
+      <div class="content-full-width">
+        <div class="search-wrapper">
+          <form action="<?=SITE_SSL_PATH?>search_data" method="post">
+            <div class="column dt-sc-three-fourth first">
+              <input class="search-input" type = "text" id = "name" required placeholder="Find topic wise Study Material, Ebooks, Subject Notes, Projects,Question paper,Lecture Videos and College event Videos, Research Paper." name="name" >           
+            </div>
+            <div class="column dt-sc-one-fourth" style="margin:0;">
+              <button class="btn-search" type="submit">Search</button>
+            </div>
+            <div class="clear"></div>
+          </form>
+		  <!--<div id="display_inside"></div>!-->
+        </div>
+      </div>
+      <!-- **Primary Section** -->
+      <section id="primary" class="with-left-sidebar">
+           <!-- <div class='dt-sc-border-title'>
+            <H2><span><?=strtr($subjectName,'_',' ')?></span></H2>
+          </div>!-->
+          <div class="description"><p><h2><?=$result_description['subcategory_short_description']?></h2></p></div>
+		 <div class="post-2261 page type-page status-publish hentry">
+          
+          <?
+
+          $sql_video_channel =  $cat->getCatChannelData($id,'1');
+ 
+		   $sql_video_channel = mysqli_query($conn, $sql_video_channel);
+
+          if(mysqli_num_rows($sql_video_channel)>0){
+              ?>
+              <div class="dt-sc-margin20"></div>
+              <div class='dt-sc-border-title'>
+                  <H3><span><font color="green">Videos</font></span></H3>
+
+              </div>
+              <div class="cntnt-box">
+                  <div id="" class="owl-carousel owl-demo">
+
+                      <? while($result_ebook_channel = mysqli_fetch_assoc($sql_video_channel)){?>
+                          <div class="item">
+                              <div class="property-item">
+                                  <div class="property-thumb ">
+                                      <ul class="porperty-slider">
+                                          <li>
+                                              <div class="video-thumb">
+                                                  <a href="<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_ebook_channel['supercategory_id']?>">
+                                                      <span class="play">&#9658;</span>
+                                                      <div class="overlay"></div>
+                                                  </a>
+                                                  <img src='<?=SITE_SSL_PATH?>/admin/supercategory_long_image/<?=$result_ebook_channel['supercategory_long_image']?>' width='338' height='130' title='<?=$result_ebook_channel['supercategory_title']?>' alt='<?=$result_ebook_channel['supercategory_title']?>' />
+                                              </div>
+                                          </li>
+                                      </ul>
+                                  </div>
+                                  <div class="video-details">
+                                      <a href="<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_ebook_channel['supercategory_id']?>" onclick='viewCount("<?=$result_ebook_channel['supercategory_id']?>")'><?=$result_ebook_channel['supercategory_title']?></a>
+                                      <div class="entry-metadata" style="margin:2px 0 0 0;">
+                                          <div class="tags"><span class="fa fa-user"> </span><span><?=$result_ebook_channel['supercategory_slug']?></span></div>
+                                          <div class="tags"><span class="fa fa-eye"> </span><span><?=view_article_count($result_ebook_channel['supercategory_id'],$conn)?></span></div>
+                                          <!--<div class="categories"><span class="fa fa-calendar"> </span><span><? $time = strtotime($result_ebook_channel['supercategory_uploaded_date']);
+                                          echo humanTiming($time).' ago'; ?></span></div>!-->
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      <?}?>
+                  </div>
+              </div>
+          <?}?>
+
+
+
+             <?
+             $sql_ebook_channel = $cat->getCatChannelData($id,'2');
+ $sql_ebook_channel = mysqli_query($conn, $sql_ebook_channel); 
+ if(mysqli_num_rows($sql_ebook_channel)>0){
+ 
+		  
+		  ?>
+
+          <div class='dt-sc-border-title'>
+              <H3><span><font color="green">E-Books</font></span></H3>
+
+          </div>
+     <p class="ex1"><?=$ebookDescription?></p></br>
+          <div class="cntnt-box">
+          	<div id="" class="owl-carousel owl-demo">
+                <? while($result_ebook_channel = mysqli_fetch_assoc($sql_ebook_channel)){?>
+                <div class="item">
+                   <div class="thumb-design">
+                  <div class="property-thumb ">
+                    <ul class="porperty-slider">
+                      <li><a href='<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_ebook_channel['supercategory_id']?>' onclick='viewCount("<?=$result_ebook_channel['supercategory_id']?>")' class='link'><img src='<?=SITE_SSL_PATH?>admin/supercategory_long_image/<?=$result_ebook_channel['supercategory_long_image']?>' width='338' height='130' title='<?=$result_ebook_channel['supercategory_title']?>' alt='<?=$result_ebook_channel['supercategory_title']?>' /></a></li>
+                    </ul>
+                  </div>
+                  <div class="video-details">
+                    <a href="<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_ebook_channel['supercategory_id']?>" onclick='viewCount("<?=$result_ebook_channel['supercategory_id']?>")'><?=$result_ebook_channel['supercategory_title']?></a>
+                    <div class="entry-metadata" style="margin:2px 0 0 0;">
+                    <div class="tags"><span class="fa fa-user"> </span><span><?=$result_ebook_channel['supercategory_slug']?></span></div>
+                		<div class="tags"><span class="fa fa-eye"> </span><span><?=view_article_count($result_ebook_channel['supercategory_id'],$conn)?></span></div>
+                		<!--<div class="categories"><span class="fa fa-calendar"> </span><span><? $time = strtotime($result_ebook_channel['supercategory_uploaded_date']);
+                          echo humanTiming($time).' ago'; ?></span></div>!-->
+                    </div>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                </div>
+                <? } ?>
+              </div>
+          </div>
+ <?}?>
+          
+          
+         
+            <?
+            $sql_notes_channel = $cat->getCatChannelData($id,'3');
+		    $sql_notes_channel = mysqli_query($conn, $sql_notes_channel);
+
+			if(mysqli_num_rows($sql_notes_channel)>0){
+			?>
+
+			<div class='dt-sc-border-title'>
+
+                <H3><span><font color="green">Subject Notes</font></span></H3>
+          </div>
+                <p class="ex1"><?=$subjectNotesDescription?></p><br>
+          <div class="cntnt-box">
+
+             <div id="" class="owl-carousel owl-demo">
+			 <? while($result_notes_channel = mysqli_fetch_assoc($sql_notes_channel)){?>
+                <div class="item">
+                   <div class="thumb-design">
+                  <div class="property-thumb ">
+                    <ul class="porperty-slider">
+                      <li><a href='<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_notes_channel['supercategory_id']?>'  onclick='viewCount("<?=$result_notes_channel['supercategory_id']?>")' class='link'><img src='<?=SITE_SSL_PATH?>admin/supercategory_long_image/<?=$result_notes_channel['supercategory_long_image']?>' width='338' height='130' title='<?=$result_notes_channel['supercategory_title']?>' alt='<?=$result_notes_channel['supercategory_title']?>' /></a></li>
+                    
+					</ul>
+                  </div>
+                  <div class="video-details">
+                    <a href="<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_notes_channel['supercategory_id']?>" onclick='viewCount("<?=$result_notes_channel['supercategory_id']?>")'><?=$result_notes_channel['supercategory_title']?></a>
+                    <div class="entry-metadata" style="margin:2px 0 0 0;">
+                    <div class="tags"><span class="fa fa-user"> </span><span><?=$result_notes_channel['supercategory_slug']?></span></div>
+                		<div class="tags"><span class="fa fa-eye"> </span><span><?=view_article_count($result_notes_channel['supercategory_id'],$conn)?></span></div>
+                		<!--<div class="categories"><span class="fa fa-calendar"> </span><span><? $time = strtotime($result_notes_channel['supercategory_uploaded_date']);
+                          echo humanTiming($time).' ago'; ?></span></div>!-->
+                    </div>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                </div>
+			 <?}?>
+			</div>
+
+          </div>
+		  <? }
+		  $sql_exam_papers_channel = $cat->getCatChannelData($id,'5');
+ $sql_exam_papers_channel = mysqli_query($conn, $sql_exam_papers_channel); 
+ if(mysqli_num_rows($sql_exam_papers_channel)>0){
+ 
+		  
+		  ?>
+
+          <div class='dt-sc-border-title '>
+
+              <H3><span><font color="green">Exam Papers</font></span></H3>
+          </div>
+          
+          <div class="cntnt-box">
+          	<div id="" class="owl-carousel owl-demo">
+                <? while($result_exam_papers_channel = mysqli_fetch_assoc($sql_exam_papers_channel)){?>
+                <div class="item">
+                   <div class="thumb-design">
+                  <div class="property-thumb ">
+                    <ul class="porperty-slider">
+                      <li><a href='<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_exam_papers_channel['supercategory_id']?>' onclick='viewCount("<?=$result_exam_papers_channel['supercategory_id']?>")' class='link'><img src='<?=SITE_SSL_PATH?>admin/supercategory_long_image/<?=$result_exam_papers_channel['supercategory_long_image']?>' width='338' height='130' title='<?=$result_exam_papers_channel['supercategory_title']?>' alt='<?=$result_exam_papers_channel['supercategory_title']?>' /></a></li>
+                    </ul>
+                  </div>
+                  <div class="video-details">
+                    <a href="<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_exam_papers_channel['supercategory_id']?>" onclick='viewCount("<?=$result_exam_papers_channel['supercategory_id']?>")'><?=$result_exam_papers_channel['supercategory_title']?></a>
+                    <div class="entry-metadata" style="margin:2px 0 0 0;">
+                    <div class="tags"><span class="fa fa-user"> </span><span><?=$result_exam_papers_channel['supercategory_slug']?></span></div>
+                		<div class="tags"><span class="fa fa-eye"> </span><span><?=view_article_count($result_exam_papers_channel['supercategory_id'],$conn)?></span></div>
+                		<!--<div class="categories"><span class="fa fa-calendar"> </span><span><? $time = strtotime($result_exam_papers_channel['supercategory_uploaded_date']);
+                          echo humanTiming($time).' ago'; ?></span></div>!-->
+                    </div>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                </div>
+                <? } ?>
+              </div>
+          </div>
+ <?}
+          $sql_novel_channel = $cat->getCatChannelData($id,'14');
+		   
+ $sql_novel_channel = mysqli_query($conn, $sql_novel_channel); 
+ if(mysqli_num_rows($sql_novel_channel)>0){
+
+		  ?>
+
+          <div class='dt-sc-border-title '>
+
+              <H3><span><font color="green">Novel</font></span></H3>
+          </div>
+          
+          <div class="cntnt-box">
+          	<div id="" class="owl-carousel owl-demo">
+                <? while($result_novel_channel = mysqli_fetch_assoc($sql_novel_channel)){?>
+                <div class="item">
+                   <div class="thumb-design">
+                  <div class="property-thumb ">
+                    <ul class="porperty-slider">
+                      <li><a href='<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_novel_channel['supercategory_id']?>'  onclick='viewCount("<?=$result_novel_channel['supercategory_id']?>")' class='link'><img src='<?=SITE_SSL_PATH?>admin/supercategory_long_image/<?=$result_novel_channel['supercategory_long_image']?>' width='338' height='130' title='<?=$result_novel_channel['supercategory_title']?>' alt='<?=$result_novel_channel['supercategory_title']?>' /></a></li>
+                    </ul>
+                  </div>
+                  <div class="video-details">
+                    <a href="<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_novel_channel['supercategory_id']?>" onclick='viewCount("<?=$result_novel_channel['supercategory_id']?>")'><?=$result_novel_channel['supercategory_title']?></a>
+                    <div class="entry-metadata" style="margin:2px 0 0 0;">
+                    <div class="tags"><span class="fa fa-user"> </span><span><?=$result_novel_channel['supercategory_slug']?></span></div>
+                		<div class="tags"><span class="fa fa-eye"> </span><span><?=view_article_count($result_novel_channel['supercategory_id'],$conn)?></span></div>
+                		<!--<div class="categories"><span class="fa fa-calendar"> </span><span><? $time = strtotime($result_novel_channel['supercategory_uploaded_date']);
+                          echo humanTiming($time).' ago'; ?></span></div>!-->
+                    </div>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                </div>
+                <? } ?>
+              </div>
+          </div>
+ <?}?>
+
+          <?  
+
+          $sql_poetry_channel = $cat->getCatChannelData($id,'10');
+ $sql_poetry_channel = mysqli_query($conn, $sql_poetry_channel); 
+ if(mysqli_num_rows($sql_poetry_channel)>0){
+ 
+		  
+		  ?>
+
+          <div class='dt-sc-border-title '>
+              <H3><span><font color="green">Poetry</font></span></H3>
+          </div>
+          
+          <div class="cntnt-box">
+          	<div id="" class="owl-carousel owl-demo">
+                <? while($result_poetry_channel = mysqli_fetch_assoc($sql_poetry_channel)){?>
+                <div class="item">
+                   <div class="thumb-design">
+                  <div class="property-thumb ">
+                    <ul class="porperty-slider">
+                      <li><a href='<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_poetry_channel['supercategory_id']?>' onclick='viewCount("<?=$result_poetry_channel['supercategory_id']?>")' class='link'><img src='<?=SITE_SSL_PATH?>admin/supercategory_long_image/<?=$result_poetry_channel['supercategory_long_image']?>' width='338' height='130' title='<?=$result_poetry_channel['supercategory_title']?>' alt='<?=$result_poetry_channel['supercategory_title']?>' /></a></li>
+                    </ul>
+                  </div>
+                  <div class="video-details">
+                    <a href="<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_poetry_channel['supercategory_id']?>" onclick='viewCount("<?=$result_poetry_channel['supercategory_id']?>")'><?=$result_poetry_channel['supercategory_title']?></a>
+                    <div class="entry-metadata" style="margin:2px 0 0 0;">
+                    <div class="tags"><span class="fa fa-user"> </span><span><?=$result_poetry_channel['supercategory_slug']?></span></div>
+                		<div class="tags"><span class="fa fa-eye"> </span><span><?=view_article_count($result_poetry_channel['supercategory_id'],$conn)?></span></div>
+
+                    </div>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                </div>
+                <? } ?>
+              </div>
+          </div>
+ <?}
+          $sql_poetry_channel = $cat->getCatChannelData($id,'6');
+ $sql_poetry_channel = mysqli_query($conn, $sql_poetry_channel); 
+ if(mysqli_num_rows($sql_poetry_channel)>0){
+ 
+		  
+		  ?>
+		            <div class='dt-sc-border-title '>
+              <H3><span><font color="green">Projects</font></span></H3>
+          </div>
+          
+          <div class="cntnt-box">
+          	<div id="" class="owl-carousel owl-demo">
+                <? while($result_poetry_channel = mysqli_fetch_assoc($sql_poetry_channel)){?>
+                <div class="item">
+                   <div class="thumb-design">
+                  <div class="property-thumb ">
+                    <ul class="porperty-slider">
+                      <li><a href='<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_poetry_channel['supercategory_id']?>' onclick='viewCount("<?=$result_poetry_channel['supercategory_id']?>")' class='link'><img src='<?=SITE_SSL_PATH?>admin/supercategory_long_image/<?=$result_poetry_channel['supercategory_long_image']?>' width='338' height='130' title='<?=$result_poetry_channel['supercategory_title']?>' alt='<?=$result_poetry_channel['supercategory_title']?>' /></a></li>
+                    </ul>
+                  </div>
+                  <div class="video-details">
+                    <a href="<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_poetry_channel['supercategory_id']?>" onclick='viewCount("<?=$result_poetry_channel['supercategory_id']?>")'><?=$result_poetry_channel['supercategory_title']?></a>
+                    <div class="entry-metadata" style="margin:2px 0 0 0;">
+                    <div class="tags"><span class="fa fa-user"> </span><span><?=$result_poetry_channel['supercategory_slug']?></span></div>
+                		<div class="tags"><span class="fa fa-eye"> </span><span><?=view_article_count($result_poetry_channel['supercategory_id'],$conn)?></span></div>
+                		<!--<div class="categories"><span class="fa fa-calendar"> </span><span><span><? $time = strtotime($result_poetry_channel['supercategory_uploaded_date']);
+                          echo humanTiming($time).' ago'; ?></span></div>!-->
+                    </div>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                </div>
+                <? } ?>
+              </div>
+          </div>
+ <?}
+          $sql_poetry_channel = $cat->getCatChannelData($id,'4');
+ 
+ $sql_poetry_channel = mysqli_query($conn, $sql_poetry_channel); 
+ if(mysqli_num_rows($sql_poetry_channel)>0){
+ 
+		  
+		  ?>
+
+          <div class='dt-sc-border-title '>
+              <H3><span><font color="green">PowerPoint Presentations</font></span></H3>
+          </div>
+     <p class="ex1"><?=$pptDescription?></p></br>
+          <div class="cntnt-box">
+          	<div id="" class="owl-carousel owl-demo">
+                <? while($result_poetry_channel = mysqli_fetch_assoc($sql_poetry_channel)){?>
+                <div class="item">
+                   <div class="thumb-design">
+                  <div class="property-thumb ">
+                    <ul class="porperty-slider">
+                      <li><a href='<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_poetry_channel['supercategory_id']?>' onclick='viewCount("<?=$result_poetry_channel['supercategory_id']?>")'class='link'><img src='<?=SITE_SSL_PATH?>admin/supercategory_long_image/<?=$result_poetry_channel['supercategory_long_image']?>' width='338' height='130' title='<?=$result_poetry_channel['supercategory_title']?>' alt='<?=$result_poetry_channel['supercategory_title']?>' /></a></li>
+                    </ul>
+                  </div>
+                  <div class="video-details">
+                    <a href="<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_poetry_channel['supercategory_id']?>" onclick='viewCount("<?=$result_poetry_channel['supercategory_id']?>")'><?=$result_poetry_channel['supercategory_title']?></a>
+                    <div class="entry-metadata" style="margin:2px 0 0 0;">
+                    <div class="tags"><span class="fa fa-user"> </span><span><?=$result_poetry_channel['supercategory_slug']?></span></div>
+                		<div class="tags"><span class="fa fa-eye"> </span><span><?=view_article_count($result_poetry_channel['supercategory_id'],$conn)?></span></div>
+						
+
+                    </div>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                </div>
+                <? } ?>
+              </div>
+          </div>
+ <?}
+
+          $sql_poetry_channel = $cat->getCatChannelData($id,'16');
+
+          $sql_poetry_channel = mysqli_query($conn, $sql_poetry_channel);
+ if(mysqli_num_rows($sql_poetry_channel)>0){
+ 
+		  
+		  ?>
+
+          <div class='dt-sc-border-title '>
+
+              <H3><span><font color="green">Biography</font></span></H3>
+          </div>
+          
+          <div class="cntnt-box">
+          	<div id="" class="owl-carousel owl-demo">
+                <? while($result_poetry_channel = mysqli_fetch_assoc($sql_poetry_channel)){?>
+                <div class="item">
+                   <div class="thumb-design">
+                  <div class="property-thumb ">
+                    <ul class="porperty-slider">
+                      <li><a href='<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_poetry_channel['supercategory_id']?>'  onclick='viewCount("<?=$result_poetry_channel['supercategory_id']?>")' class='link'><img src='<?=SITE_SSL_PATH?>admin/supercategory_long_image/<?=$result_poetry_channel['supercategory_long_image']?>' width='338' height='130' title='<?=$result_poetry_channel['supercategory_title']?>' alt='<?=$result_poetry_channel['supercategory_title']?>' /></a></li>
+                    </ul>
+                  </div>
+                  <div class="video-details">
+                    <a href="<?=SITE_SSL_PATH?>article/<?=$recId?>/<?=$result_poetry_channel['supercategory_id']?>" onclick='viewCount("<?=$result_poetry_channel['supercategory_id']?>")'><?=$result_poetry_channel['supercategory_title']?></a>
+                    <div class="entry-metadata" style="margin:2px 0 0 0;">
+                    <div class="tags"><span class="fa fa-user"> </span><span><?=$result_poetry_channel['supercategory_slug']?></span></div>
+                		<div class="tags"><span class="fa fa-eye"> </span><span><?=view_article_count($result_poetry_channel['supercategory_id'],$conn)?></span></div>
+						
+
+                    </div>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                </div>
+                <? } ?>
+              </div>
+          </div>
+ <?}?>
+        </div>
+        
+        <div class="clear"></div>
+        </div>
+
+    </div>
+  </div>
+  
+  <!-- **Footer** -->
+ <?php include("footer.php");?>
+</div>
+<script type='text/javascript' src='js/shortcodes.js'></script> 
+<script type='text/javascript' src='js/jquery.form.min.js'></script> 
+<script type='text/javascript' src='js/easing.js'></script> 
+<script type='text/javascript' src='js/jquery.nicescroll.min.js'></script> 
+<script type='text/javascript' src='js/jquery.ui.totop.min.js'></script> 
+<script type='text/javascript' src='js/jquery.sticky.js'></script> 
+<script type='text/javascript' src='js/jquery.isotope.min.js'></script> 
+<script type='text/javascript' src='js/jquery.prettyPhoto.js'></script> 
+<script type='text/javascript' src='js/jquery.fitvids.js'></script> 
+<script type='text/javascript' src='js/jquery.cookie.js'></script> 
+<script type='text/javascript' src='js/jquery.smartresize.js'></script> 
+<script type='text/javascript' src='js/jquery.mobilemenu.js'></script> 
+<script type='text/javascript' src='js/custom.js'></script> 
+<script type='text/javascript' src='js/jquery.carouFredSel-6.2.1-packed.js'></script> 
+
+</body>
+</html>
